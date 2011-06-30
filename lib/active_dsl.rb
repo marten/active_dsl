@@ -1,7 +1,7 @@
 require 'active_support/core_ext'
 
 module ActiveDSL
-  class Factory
+  class Builder
     @@fields = {}
     @@has_many = {}
 
@@ -36,11 +36,11 @@ module ActiveDSL
       @@has_many[name] = options
 
       singular = name.to_s.singularize
-      factory_class = "#{singular}_factory".classify.constantize
+      builder_class = "#{singular}_builder".classify.constantize
       instance_eval do
         define_method(singular) do |&block|
           # @values[:components] ||= []
-          @values[name] << factory_class.new(&block)
+          @values[name] << builder_class.new(&block)
         end
       end
     end
