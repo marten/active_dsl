@@ -50,7 +50,7 @@ describe "ActiveDsl" do
         instance.should be_a(Sprocket)
         instance.name.should == "Coffee Mug"
         instance.components.size.should == 3
-        instance.components.first.name.should == "Handle"
+        instance.components.map(&:name).should == ["Handle", "Cup", "Great coffee"]
       end
     end
 
