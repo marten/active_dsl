@@ -2,6 +2,58 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe "ActiveDsl" do
   describe "Builder" do
+
+    describe "building an instance" do
+      before(:all) do
+        class Sprocket
+          attr_accessor :name
+          attr_accessor :components
+        end
+
+        class Component
+          attr_accessor :name
+        end
+
+        class ComponentBuilder < ActiveDSL::Builder
+          builds Component
+          field :name
+        end
+
+        class SprocketBuilder < ActiveDSL::Builder
+          builds Sprocket
+          field :name
+          has_many :components
+        end
+      end
+
+      it "should fill out fields" do
+        builder = SprocketBuilder.new("name 'Coffee Mug'")
+        instance = builder.to_instance
+        instance.should be_a(Sprocket)
+        instance.name.should == "Coffee Mug"
+      end
+
+      it "should build associations" do
+        builder = SprocketBuilder.new(<<-END)
+          name "Coffee Mug"
+          component do
+            name "Handle"
+          end
+          component do
+            name "Cup"
+          end
+          component do
+            name "Great coffee"
+          end
+        END
+        instance = builder.to_instance
+        instance.should be_a(Sprocket)
+        instance.name.should == "Coffee Mug"
+        instance.components.size.should == 3
+        instance.components.first.name.should == "Handle"
+      end
+    end
+
     describe "attributes" do
       before(:all) do
         class SprocketBuilder < ActiveDSL::Builder

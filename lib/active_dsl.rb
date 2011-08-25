@@ -2,6 +2,7 @@ require 'active_support/core_ext'
 
 module ActiveDSL
   class Builder
+    @@builds = nil
     @@fields = {}
     @@has_many = {}
 
@@ -20,6 +21,24 @@ module ActiveDSL
       @@fields.each {|name, options| result[name] = @values[name] }
       @@has_many.each {|name, options| result[name] = @values[name].map(&:to_hash) }
       return result
+    end
+
+    def to_instance
+      @instance = @@builds.new
+
+      @@fields.each do |name, options| 
+        @instance.send("#{name}=", @values[name])
+      end
+
+      @@has_many.each do |name, options| 
+        @instance.send("#{name}=", @values[name].map(&:to_instance))
+      end
+      
+      @instance
+    end
+
+    def self.builds(klass)
+      @@builds = klass
     end
 
     def self.field(name, options = {})
