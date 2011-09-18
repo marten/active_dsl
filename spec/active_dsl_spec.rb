@@ -26,6 +26,11 @@ describe "ActiveDsl" do
         end
       end
 
+      it "should raise an InstanceClassNotSpecified exception if its not specified what to build" do
+        class FooBuilder < ActiveDSL::Builder; end
+        expect { FooBuilder.new("").to_instance }.to raise_error(ActiveDSL::Builder::InstanceClassNotSpecified)
+      end
+
       it "should fill out fields" do
         builder = SprocketBuilder.new("name 'Coffee Mug'")
         instance = builder.to_instance
