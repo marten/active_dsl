@@ -54,6 +54,31 @@ describe "ActiveDsl" do
       end
     end
 
+    describe "callbacks" do
+      before(:all) do
+        class Sprocket
+          def save
+            @saved = true
+          end
+
+          def saved?
+            @saved || false
+          end
+        end
+        class SprocketBuilder < ActiveDSL::Builder
+          builds Sprocket
+          after_build_instance do |instance|
+            instance.save
+          end
+        end
+      end
+
+      it "should save the instance" do
+        instance = SprocketBuilder.new("").to_instance
+        instance.saved?.should be_true
+      end
+    end
+
     describe "attributes" do
       before(:all) do
         class SprocketBuilder < ActiveDSL::Builder

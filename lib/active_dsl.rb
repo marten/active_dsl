@@ -3,6 +3,7 @@ require 'active_support/core_ext'
 module ActiveDSL
   class Builder
     @@builds = nil
+    @@callbacks = {}
     @@fields = {}
     @@has_many = {}
 
@@ -33,12 +34,20 @@ module ActiveDSL
       @@has_many.each do |name, options| 
         @instance.send("#{name}=", @values[name].map(&:to_instance))
       end
+
+      if @@callbacks[:after_build_instance]
+        @@callbacks[:after_build_instance].call(@instance)
+      end
       
       @instance
     end
 
     def self.builds(klass)
       @@builds = klass
+    end
+
+    def self.after_build_instance(options = {}, &block)
+      @@callbacks[:after_build_instance] = block
     end
 
     def self.field(name, options = {})
