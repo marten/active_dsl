@@ -2,56 +2,62 @@ require 'active_support/core_ext'
 
 module ActiveDSL
   class Builder
-    @@builds = nil
-    @@callbacks = {}
-    @@fields = {}
-    @@has_many = {}
+    class InstanceClassNotSpecified < Exception; end
+
+    class << self
+      attr_accessor :class_to_build
+      attr_accessor :callbacks
+      attr_accessor :fields
+      attr_accessor :has_many_relations
+    end
 
     def initialize(dsl_text = nil, &block)
       @values = {}
-      @@has_many.each {|name, options| @values[name] = []}
-      if block_given?
-        instance_eval &block
-      else
-        instance_eval(dsl_text)
-      end
+      self.class.has_many_relations.each {|name, options| @values[name] = []} if self.class.has_many_relations
+
+      instance_eval &block if block_given?
+      instance_eval(dsl_text) if dsl_text
     end
 
     def to_hash
       result = Hash.new
-      @@fields.each {|name, options| result[name] = @values[name] }
-      @@has_many.each {|name, options| result[name] = @values[name].map(&:to_hash) }
+      self.class.fields.each {|name, options| result[name] = @values[name] } if self.class.fields
+      self.class.has_many_relations.each {|name, options| result[name] = @values[name].map(&:to_hash) } if self.class.has_many_relations
       return result
     end
 
     def to_instance
-      @instance = @@builds.new
+      raise InstanceClassNotSpecified unless self.class.class_to_build
 
-      @@fields.each do |name, options| 
+      @instance = self.class.class_to_build.new
+
+      self.class.fields.each do |name, options| 
         @instance.send("#{name}=", @values[name])
-      end
+      end if self.class.fields
 
-      @@has_many.each do |name, options| 
+      self.class.has_many_relations.each do |name, options| 
         @instance.send("#{name}=", @values[name].map(&:to_instance))
-      end
+      end if self.class.has_many_relations
 
-      if @@callbacks[:after_build_instance]
-        @@callbacks[:after_build_instance].call(@instance)
-      end
+      if self.class.callbacks[:after_build_instance]
+        self.class.callbacks[:after_build_instance].call(@instance)
+      end if self.class.callbacks
       
-      @instance
+      return @instance
     end
 
     def self.builds(klass)
-      @@builds = klass
+      self.class_to_build = klass
     end
 
     def self.after_build_instance(options = {}, &block)
-      @@callbacks[:after_build_instance] = block
+      self.callbacks ||= {}
+      self.callbacks[:after_build_instance] = block
     end
 
     def self.field(name, options = {})
-      @@fields[name] = options
+      self.fields ||= {}
+      self.fields[name] = options
 
       instance_eval do
         define_method(name) do |value|
@@ -61,7 +67,8 @@ module ActiveDSL
     end
     
     def self.has_many(name, options = {})
-      @@has_many[name] = options
+      self.has_many_relations ||= {}
+      self.has_many_relations[name] = options
 
       singular = name.to_s.singularize
       builder_class = "#{singular}_builder".classify.constantize
