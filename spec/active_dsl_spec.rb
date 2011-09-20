@@ -152,7 +152,6 @@ describe "ActiveDsl" do
           field :name
           has_many :components
         end
-
       end
 
       it "should work with has-many associations" do
