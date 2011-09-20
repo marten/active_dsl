@@ -29,7 +29,11 @@ module ActiveDSL
     def to_instance
       raise InstanceClassNotSpecified unless self.class.class_to_build
 
-      @instance = self.class.class_to_build.new
+      if self.class.callbacks and self.class.callbacks[:before_build_instance]
+        @instance = self.class.callbacks[:before_build_instance].call(self)
+      else
+        @instance = self.class.class_to_build.new
+      end
 
       self.class.fields.each do |name, options| 
         @instance.send("#{name}=", @values[name])
@@ -48,6 +52,11 @@ module ActiveDSL
 
     def self.builds(klass)
       self.class_to_build = klass
+    end
+
+    def self.initialize_instance_by(options = {}, &block)
+      self.callbacks ||= {}
+      self.callbacks[:before_build_instance] = block
     end
 
     def self.after_build_instance(options = {}, &block)

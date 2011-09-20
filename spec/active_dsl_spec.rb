@@ -69,6 +69,12 @@ describe "ActiveDsl" do
       before(:all) do
         Sprocket = Class.new
         class Sprocket
+          attr_accessor :name
+
+          def initialize(name = nil)
+            @name = name
+          end
+
           def save
             @saved = true
           end
@@ -81,16 +87,27 @@ describe "ActiveDsl" do
         SprocketBuilder = Class.new(ActiveDSL::Builder)
         class SprocketBuilder < ActiveDSL::Builder
           builds Sprocket
+
+          initialize_instance_by do |builder|
+            Sprocket.new("foo")
+          end
+
           after_build_instance do |instance|
             instance.save
           end
         end
       end
 
+      it "should build the instance using a callback" do
+        SprocketBuilder.new("").to_instance.name.should == "foo"
+      end
+
       it "should save the instance" do
         instance = SprocketBuilder.new("").to_instance
         instance.saved?.should be_true
       end
+
+      
     end
 
     describe "attributes" do
