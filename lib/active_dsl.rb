@@ -64,13 +64,13 @@ module ActiveDSL
       self.callbacks[:after_build_instance] = block
     end
 
-    def self.field(name, options = {})
+    def self.field(name, options = {}, &block)
       self.fields ||= {}
-      self.fields[name] = options
+      self.fields[name] = options.merge({:mapper => block})
 
       instance_eval do
         define_method(name) do |value|
-          @values[name] = value
+          @values[name] = block ? block.call(value) : value
         end
       end
     end

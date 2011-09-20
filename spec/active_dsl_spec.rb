@@ -110,11 +110,14 @@ describe "ActiveDsl" do
       
     end
 
-    describe "attributes" do
+    describe "fields" do
       before(:all) do
         SprocketBuilder = Class.new(ActiveDSL::Builder)
         class SprocketBuilder < ActiveDSL::Builder
           field :name
+          field :other do |value|
+            value.upcase
+          end
         end
       end
 
@@ -131,6 +134,10 @@ describe "ActiveDsl" do
       it "should be possible to give an attribute a value from the DSL" do
         dsl = "name 'Coffee Mug'"
         SprocketBuilder.new(dsl).to_hash[:name].should == "Coffee Mug"
+      end
+
+      it "should be possible to modify a given value" do
+        SprocketBuilder.new("other 'Foo'").to_hash[:other].should == "FOO"
       end
 
       it "should be possible to override a previous value" do
