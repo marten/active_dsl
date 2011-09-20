@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "active_dsl"
   gem.homepage = "http://github.com/marten/active_dsl"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Easily create expression builders for your DSL using a DSL}
+  gem.description = %Q{ActiveDSL allows you to create your DSL using our DSL. We use the expression builder style of DSL, which allows for clean separation between your models and the DSL.}
   gem.email = "marten@veldthuis.com"
   gem.authors = ["Marten Veldthuis"]
   # dependencies defined in Gemfile

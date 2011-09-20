@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Marten Veldthuis"]
   s.date = "2011-09-20"
-  s.description = "TODO: longer description of your gem"
+  s.description = "ActiveDSL allows you to create your DSL using our DSL. We use the expression builder style of DSL, which allows for clean separation between your models and the DSL."
   s.email = "marten@veldthuis.com"
   s.executables = ["autospec", "htmldiff", "jeweler", "ldiff", "rcov", "rspec", "spork"]
   s.extra_rdoc_files = [
@@ -27,6 +27,7 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "active_dsl.gemspec",
     "bin/autospec",
     "bin/htmldiff",
     "bin/jeweler",
@@ -42,7 +43,7 @@ Gem::Specification.new do |s|
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = "1.8.10"
-  s.summary = "TODO: one-line summary of your gem"
+  s.summary = "Easily create expression builders for your DSL using a DSL"
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
