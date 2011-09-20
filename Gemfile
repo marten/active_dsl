@@ -2,7 +2,7 @@ source "http://rubygems.org"
 # Add dependencies required to use your gem here.
 # Example:
 
-gem 'rake', '0.8.7'
+gem 'rake', '0.9.2'
 gem "activesupport", ">= 3.0.9"
 gem 'i18n'
 
