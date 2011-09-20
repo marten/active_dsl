@@ -106,8 +106,6 @@ describe "ActiveDsl" do
         instance = SprocketBuilder.new("").to_instance
         instance.saved?.should be_true
       end
-
-      
     end
 
     describe "fields" do
@@ -118,6 +116,7 @@ describe "ActiveDsl" do
           field :other do |value|
             value.upcase
           end
+          field :with_default, :default => 'mydefault'
         end
       end
 
@@ -144,6 +143,11 @@ describe "ActiveDsl" do
         dsl = "name 'Coffee Mug'
                name 'Tea Cup'"
         SprocketBuilder.new(dsl).to_hash[:name].should == "Tea Cup"
+      end
+      
+      it "should be possible to give a default" do
+        SprocketBuilder.new("with_default 'a'").to_hash[:with_default].should == 'a'
+        SprocketBuilder.new("").to_hash[:with_default].should == 'mydefault'
       end
     end
 

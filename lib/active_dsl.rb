@@ -21,8 +21,15 @@ module ActiveDSL
 
     def to_hash
       result = Hash.new
-      self.class.fields.each {|name, options| result[name] = @values[name] } if self.class.fields
-      self.class.has_many_relations.each {|name, options| result[name] = @values[name].map(&:to_hash) } if self.class.has_many_relations
+
+      self.class.fields.each do |name, options| 
+        result[name] = @values[name] || options[:default]
+      end if self.class.fields
+
+      self.class.has_many_relations.each do |name, options| 
+        result[name] = @values[name].map(&:to_hash)
+      end if self.class.has_many_relations
+      
       return result
     end
 
@@ -36,7 +43,7 @@ module ActiveDSL
       end
 
       self.class.fields.each do |name, options| 
-        @instance.send("#{name}=", @values[name])
+        @instance.send("#{name}=", @values[name] || options[:default])
       end if self.class.fields
 
       self.class.has_many_relations.each do |name, options| 
