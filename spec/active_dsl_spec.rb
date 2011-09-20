@@ -5,20 +5,24 @@ describe "ActiveDsl" do
 
     describe "building an instance" do
       before(:all) do
+        Sprocket = Class.new
         class Sprocket
           attr_accessor :name
           attr_accessor :components
         end
 
+        Component = Class.new
         class Component
           attr_accessor :name
         end
 
+        ComponentBuilder = Class.new(ActiveDSL::Builder)
         class ComponentBuilder < ActiveDSL::Builder
           builds Component
           field :name
         end
 
+        SprocketBuilder = Class.new(ActiveDSL::Builder)
         class SprocketBuilder < ActiveDSL::Builder
           builds Sprocket
           field :name
@@ -27,6 +31,7 @@ describe "ActiveDsl" do
       end
 
       it "should raise an InstanceClassNotSpecified exception if its not specified what to build" do
+        FooBuilder = Class.new(ActiveDSL::Builder)
         class FooBuilder < ActiveDSL::Builder; end
         expect { FooBuilder.new("").to_instance }.to raise_error(ActiveDSL::Builder::InstanceClassNotSpecified)
       end
@@ -62,6 +67,7 @@ describe "ActiveDsl" do
 
     describe "callbacks" do
       before(:all) do
+        Sprocket = Class.new
         class Sprocket
           def save
             @saved = true
@@ -71,6 +77,8 @@ describe "ActiveDsl" do
             @saved || false
           end
         end
+
+        SprocketBuilder = Class.new(ActiveDSL::Builder)
         class SprocketBuilder < ActiveDSL::Builder
           builds Sprocket
           after_build_instance do |instance|
@@ -87,6 +95,7 @@ describe "ActiveDsl" do
 
     describe "attributes" do
       before(:all) do
+        SprocketBuilder = Class.new(ActiveDSL::Builder)
         class SprocketBuilder < ActiveDSL::Builder
           field :name
         end
@@ -116,10 +125,12 @@ describe "ActiveDsl" do
 
     describe "has-many associations" do
       before(:all) do
+        ComponentBuilder = Class.new(ActiveDSL::Builder)
         class ComponentBuilder < ActiveDSL::Builder
           field :name
         end
 
+        SprocketBuilder = Class.new(ActiveDSL::Builder)
         class SprocketBuilder < ActiveDSL::Builder
           field :name
           has_many :components
